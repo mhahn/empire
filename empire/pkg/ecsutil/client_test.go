@@ -177,6 +177,33 @@ func TestListAppTasks_Paginate(t *testing.T) {
 	}
 }
 
+func TestListAppTaskDefinitions(t *testing.T) {
+	h := awsutil.NewHandler([]awsutil.Cycle{
+		awsutil.Cycle{
+			Request: awsutil.Request{
+				RequestURI: "/",
+				Operation:  "AmazonEC2ContainerServiceV20141113.ListTaskDefinitions",
+				Body:       `{}`,
+			},
+			Response: awsutil.Response{
+				StatusCode: 200,
+				Body:       `{"taskDefinitionArns":["arn:aws:ecs:us-east-1:249285743859:task-definition/ae69bb4c-3903-4844-82fe-548ac5b74570--web"]}`,
+			},
+		},
+	})
+	m, s := newTestClient(h)
+	defer s.Close()
+
+	resp, err := m.ListAppTaskDefinitions(context.Background(), "ae69bb4c-3903-4844-82fe-548ac5b74570", &ecs.ListTaskDefinitionsInput{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if got := len(resp.TaskDefinitionARNs); got != 1 {
+		t.Fatalf("Expected 1 tasks returned; got %d", got)
+	}
+}
+
 func newTestClient(h http.Handler) (*Client, *httptest.Server) {
 	s := httptest.NewServer(h)
 

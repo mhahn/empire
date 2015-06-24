@@ -15,6 +15,7 @@ type ECS interface {
 	// Task Definitions
 	RegisterTaskDefinition(context.Context, *ecs.RegisterTaskDefinitionInput) (*ecs.RegisterTaskDefinitionOutput, error)
 	DescribeTaskDefinition(context.Context, *ecs.DescribeTaskDefinitionInput) (*ecs.DescribeTaskDefinitionOutput, error)
+	ListTaskDefinitions(context.Context, *ecs.ListTaskDefinitionsInput) (*ecs.ListTaskDefinitionsOutput, error)
 
 	// Services
 	CreateService(context.Context, *ecs.CreateServiceInput) (*ecs.CreateServiceOutput, error)
@@ -85,6 +86,13 @@ func (c *ecsClient) DescribeTaskDefinition(ctx context.Context, input *ecs.Descr
 	ctx, done := trace.Trace(ctx)
 	resp, err := c.ECS.DescribeTaskDefinition(input)
 	done(err, "DescribeTaskDefinition", "task-definition", stringField(input.TaskDefinition))
+	return resp, err
+}
+
+func (c *ecsClient) ListTaskDefinitions(ctx context.Context, input *ecs.ListTaskDefinitionsInput) (*ecs.ListTaskDefinitionsOutput, error) {
+	ctx, done := trace.Trace(ctx)
+	resp, err := c.ECS.ListTaskDefinitions(input)
+	done(err, "ListTaskDefinitions", "family-prefix", stringField(input.FamilyPrefix))
 	return resp, err
 }
 

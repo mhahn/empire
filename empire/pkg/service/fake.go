@@ -63,3 +63,7 @@ func (m *FakeManager) Instances(ctx context.Context, appID string) ([]*Instance,
 func (m *FakeManager) Stop(ctx context.Context, instanceID string) error {
 	return nil
 }
+
+func (m *FakeManager) Restart(ctx context.Context, app, process string) error {
+	return nil
+}

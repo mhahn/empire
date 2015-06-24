@@ -259,12 +259,40 @@ func (m *ECSManager) describeAppTasks(ctx context.Context, appID string) ([]*ecs
 	return tasks.Tasks, err
 }
 
+// Stop stops a specific ECS task.
 func (m *ECSManager) Stop(ctx context.Context, instanceID string) error {
 	_, err := m.ecs.StopTask(ctx, &ecs.StopTaskInput{
 		Cluster: aws.String(m.cluster),
 		Task:    aws.String(instanceID),
 	})
 	return err
+}
+
+// Restart restarts ECS services.
+func (m *ECSManager) Restart(ctx context.Context, app string, process string) error {
+	resp, err := m.ecs.ListAppTaskDefinitions(ctx, app, &ecs.ListTaskDefinitionsInput{
+		FamilyPrefix: aws.String(process),
+	})
+	if err != nil {
+		return err
+	}
+
+	for _, arn := range resp.TaskDefinitionARNs {
+		resp, err := m.ecs.DescribeTaskDefinition(ctx, &ecs.DescribeTaskDefinitionInput{
+			TaskDefinition: arn,
+		})
+		if err != nil {
+			return err
+		}
+
+		//if _, err := m.ecs.RegisterTaskDefinition
+
+		resp, err := m.ecs.UpdateAppService(ctx, app.ID, &ecs.UpdateServiceInput{
+			TaskDefinition: aws.String(p.Type),
+		})
+	}
+
+	return nil
 }
 
 var _ ProcessManager = &ecsProcessManager{}

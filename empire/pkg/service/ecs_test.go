@@ -391,6 +391,39 @@ func TestECSManager_Processes(t *testing.T) {
 	}
 }
 
+func TestECSManager_Restart(t *testing.T) {
+	h := awsutil.NewHandler([]awsutil.Cycle{
+		awsutil.Cycle{
+			Request: awsutil.Request{
+				RequestURI: "/",
+				Operation:  "AmazonEC2ContainerServiceV20141113.ListTaskDefinitions",
+				Body:       `{"familyPrefix":"1234--"}`,
+			},
+			Response: awsutil.Response{
+				StatusCode: 200,
+				Body:       `{"taskDefinitionArns":["arn:aws:ecs:us-east-1:249285743859:task-definition/ae69bb4c-3903-4844-82fe-548ac5b74570--web"]}`,
+			},
+		},
+		awsutil.Cycle{
+			Request: awsutil.Request{
+				RequestURI: "/",
+				Operation:  "AmazonEC2ContainerServiceV20141113.DescribeTaskDefinition",
+				Body:       `{"taskDefinition":"arn:aws:ecs:us-east-1:249285743859:task-definition/ae69bb4c-3903-4844-82fe-548ac5b74570--web"}`,
+			},
+			Response: awsutil.Response{
+				StatusCode: 200,
+				Body:       `{"taskDefinition":{"containerDefinitions":[{"cpu":128,"command":["acme-inc","web"],"environment":[{"name":"USER","value":"foo"}],"essential":true,"image":"remind101/acme-inc:latest","memory":128,"name":"web"}]}}`,
+			},
+		},
+	})
+	m, s := newTestECSManager(h)
+	defer s.Close()
+
+	if err := m.Restart(context.Background(), "1234", ""); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestDiffProcessTypes(t *testing.T) {
 	tests := []struct {
 		old, new []*Process

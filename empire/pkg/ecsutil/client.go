@@ -61,6 +61,12 @@ func (c *Client) RegisterAppTaskDefinition(ctx context.Context, app string, inpu
 	return c.ECS.RegisterTaskDefinition(ctx, input)
 }
 
+// ListAppTaskDefinitions lists task definitions for the app.
+func (c *Client) ListAppTaskDefinitions(ctx context.Context, app string, input *ecs.ListTaskDefinitionsInput) (*ecs.ListTaskDefinitionsOutput, error) {
+	input.FamilyPrefix = c.prefix(app, input.FamilyPrefix)
+	return c.ECS.ListTaskDefinitions(ctx, input)
+}
+
 // ListAppTasks lists all the tasks for the app.
 func (c *Client) ListAppTasks(ctx context.Context, appID string, input *ecs.ListTasksInput) (*ecs.ListTasksOutput, error) {
 	var arns []*string

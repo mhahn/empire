@@ -100,18 +100,15 @@ type DeleteProcesses struct {
 
 func (h *DeleteProcesses) ServeHTTPContext(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	vars := httpx.Vars(ctx)
+	ptype := empire.ProcessType(vars["ptype"])
 	pid := vars["pid"]
-
-	if vars["ptype"] != "" {
-		return errNotImplemented("Restarting a process type is currently not implemented.")
-	}
 
 	a, err := findApp(ctx, h)
 	if err != nil {
 		return err
 	}
 
-	err = h.ProcessesRestart(ctx, a, pid)
+	err = h.ProcessesRestart(ctx, a, ptype, pid)
 	if err != nil {
 		return err
 	}

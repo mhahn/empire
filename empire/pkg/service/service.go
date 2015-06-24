@@ -119,6 +119,10 @@ type Manager interface {
 	// Stop stops an instance. The scheduler will automatically start a new
 	// instance.
 	Stop(ctx context.Context, instanceID string) error
+
+	// Restart rolling restarts an app. If a non empty string is provided for the
+	// process, only that process will be restarted.
+	Restart(ctx context.Context, app, process string) error
 }
 
 // ProcessManager is a layer level interface than Manager, that provides direct
