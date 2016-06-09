@@ -515,6 +515,17 @@
             {
               "Effect": "Allow",
               "Action": [
+                "kinesis:DescribeStream",
+                "kinesis:PutRecord",
+                "kinesis:PutRecords",
+                "kinesis:GetRecords",
+                "kinesis:GetShardIterator"
+              ],
+              "Resource": ["*"]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
                 "route53:GetChange*"
               ],
               "Resource": "arn:aws:route53:::change/*"
